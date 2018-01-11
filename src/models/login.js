@@ -17,24 +17,23 @@ export default {
         type: 'changeSubmitting',
         payload: true,
       });
-
       const response = yield call(accountLogin, payload);
       yield put({
         type: 'changeLoginStatus',
         payload: response,
       });
-
+      console.log(response.user.trueName);
       // Login successfully
-      if (response.status === 'ok') {
+      if (response.status) {
         yield put({
           type: 'addUserName',
-          payload: response,
+          payload: response.user.trueName,
         });
-
         yield put(routerRedux.push('/'));
       }
 
     },
+
     * logout(_, {put}) {
       yield put({
         type: 'changeLoginStatus',
@@ -44,9 +43,11 @@ export default {
       });
       yield put(routerRedux.push('/user/login'));
     },
+
     * invalidLogin(_, {put}) {
       yield put(routerRedux.push('/user/login'));
     }
+
   },
 
 
@@ -67,7 +68,7 @@ export default {
     addUserName(state, {payload}) {
       return {
         ...state,
-        userName: payload.userName,
+        userName: payload,
       }
     },
   },

@@ -63,10 +63,10 @@ class BasicLayout extends React.PureComponent {
   getPageTitle() {
     const {location, getRouteData} = this.props;
     const {pathname} = location;
-    let title = '目博科技';
+    let title = '必要管理后台';
     getRouteData('BasicLayout').forEach((item) => {
       if (item.path === pathname) {
-        title = `${item.name} - 目博科技`;
+        title = `${item.name} - 必要管理后台`;
       }
     });
     return title;
@@ -88,7 +88,7 @@ class BasicLayout extends React.PureComponent {
     let URL = '';
     const userName = this.props.userName;
     if (userName != null) {
-      URL = '/dashboard/gateform'
+      URL = '/users'
     } else {
       URL = '/user/login'
     }
@@ -132,22 +132,9 @@ class BasicLayout extends React.PureComponent {
               </Switch>
             </div>
             <GlobalFooter
-              links={[{
-                title: '官方首页',
-                href: 'http://www.movebroad.cn/',
-                blankTarget: true,
-              }, {
-                title: '解决方案',
-                href: 'http://www.movebroad.cn/a/about/',
-                blankTarget: true,
-              }, {
-                title: '联系我们',
-                href: 'http://www.movebroad.cn/a/contact/',
-                blankTarget: true,
-              }]}
               copyright={
                 <div>
-                  Copyright <Icon type="copyright"/> 2017 目博科技出品
+                  Copyright <Icon type="copyright"/> 2017 必要
                 </div>
               }
             />

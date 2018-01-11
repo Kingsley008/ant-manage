@@ -1,15 +1,14 @@
 import request from '../utils/request';
 
-const key = 'http://localhost:4002/api/method=get&appkey=436etaq52e57a3cd028ab56b&seckey=sec-mj12Slu12w1Xs1er8ZzmGZqw5qrpFmqw25jHULr13eUZCswA';
-// TODO 加密 cors 暂时使用get
-export async function accountLogin(payload) {
+const key = 'http://localhost:8080/biyaoweb';
 
-  return request(`${key}/v1/user/login/account/${payload.userName}/${payload.password}`, {
+export async function accountLogin(payload) {
+  console.log(payload);
+  return request(`${key}/admin?userName=${payload.userName}&password=${payload.password}`, {
     method:'GET',
     mode:'cors',
-    credentials: "",
+    body:payload
   })
-
 }
 
 export async function queryCurrent(payload) {

@@ -16,55 +16,33 @@ export const getNavData = app => [
     path: '/',
     children: [
       {
-        name: '设备信息录入',
+        name: 'dashboard',
         icon: 'form',
         path: 'dashboard',
-        children: [
-          {
-            name: '网关信息录入',
-            path: 'gateform',
-            component: dynamicWrapper(app, ['device'], () => import('../routes/Forms/GateForm')),
-          },
-        ],
+        component: dynamicWrapper(app, ['dashboard'], () => import('../routes/Dashboard.js')),
       },
+
       {
-        name:'车流量检测-Table',
-        path:'flow',
-        icon:'dashboard',
-        children:[
-          {
-            name:'车流量-Table 1',
-            path:'table1',
-            component:dynamicWrapper(app, ['flowtableone'], ()=> import('../routes/Dashboard/FlowTableOne')),
-
-          },
-          {
-            name:'车流量-Table 2',
-            path:'table2',
-            component:dynamicWrapper(app, ['flowtabletwo'], ()=> import('../routes/Dashboard/FlowTableTwo')),
-
-          },
-          {
-            name:'车流量-Table 3',
-            path:'table3',
-            component:dynamicWrapper(app, ['flowtablethree'], ()=> import('../routes/Dashboard/FlowTableThree')),
-
-          }
-        ]
+        name:'用户管理',
+        path:'users',
+        icon:'table',
+        component:dynamicWrapper(app, ['users'], ()=> import('../routes/Forms/UsersForm')),
       },
+
       {
-        name:'车流量检测-Chart',
-        path:'chart',
-        icon:'dashboard',
-        children:[
-          {
-            name:'车流量-Chart 1',
-            path:'chart1',
-            component:dynamicWrapper(app, ['flowchartone'], ()=> import('../routes/Dashboard/FlowChartOne')),
-
-          },
-        ]
+        name:'商品管理',
+        path:'goods',
+        icon:'table',
+        component:dynamicWrapper(app, ['flowchartone'], ()=> import('../routes/Dashboard/FlowChartOne')),
       },
+
+      {
+        name:'订单管理',
+        path:'orders',
+        icon:'form',
+        component:dynamicWrapper(app, ['flowchartone'], ()=> import('../routes/Dashboard/FlowChartOne')),
+      },
+
    /*   {
         name: '表单页',
         path: 'form',

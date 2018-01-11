@@ -1,5 +1,4 @@
 import {queryLaneAndLastMinutes, queryAllCrossID, findLaneNoById} from '../services/flow';
-import {findRoadNameById} from '../services/device';
 
 export default {
   namespace: 'flowChartOne',

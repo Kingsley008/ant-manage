@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Link } from 'dva/router';
 import { Form, Input, Tabs, Button, Icon, Checkbox, Row, Col, Alert } from 'antd';
+import md5 from 'js-md5';
 import styles from './Login.less';
 
 const FormItem = Form.Item;
@@ -45,6 +46,7 @@ export default class Login extends Component {
     this.props.form.validateFields({ force: true },
       (err, values) => {
         if (!err) {
+          values.password = md5(values.password);
           this.props.dispatch({
             type: 'login/login',
             payload: {
@@ -55,7 +57,7 @@ export default class Login extends Component {
         }
       }
     );
-  }
+  };
 
   renderMessage = (message) => {
     return (
