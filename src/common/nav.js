@@ -33,7 +33,7 @@ export const getNavData = app => [
         name:'商品管理',
         path:'goods',
         icon:'table',
-        component:dynamicWrapper(app, ['flowchartone'], ()=> import('../routes/Dashboard/FlowChartOne')),
+        component:dynamicWrapper(app, ['goods'], ()=> import('../routes/Dashboard/GoodsTable')),
       },
 
       {

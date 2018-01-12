@@ -6,8 +6,8 @@ export default {
 
   namespace: 'login',
   state: {
-    status: undefined,
-    type:'account',
+    status: true,
+    type: 'account',
     userName: Cookies.get('userName') || null,
   },
 
@@ -18,20 +18,31 @@ export default {
         payload: true,
       });
       const response = yield call(accountLogin, payload);
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      });
-      console.log(response.user.trueName);
       // Login successfully
       if (response.status) {
         yield put({
           type: 'addUserName',
           payload: response.user.trueName,
         });
-        yield put(routerRedux.push('/'));
-      }
+        Cookies.set('userName', response.user.trueName,{ expires: 90 });
 
+        yield put({
+          type: 'changeLoginStatus',
+          payload: {
+            status: true,
+          },
+        });
+        console.log('push');
+        yield put(routerRedux.push('/'));
+
+      } else {
+        yield put({
+          type: 'changeLoginStatus',
+          payload: {
+            status: false,
+          },
+        });
+      }
     },
 
     * logout(_, {put}) {
@@ -65,6 +76,7 @@ export default {
         submitting: payload,
       };
     },
+
     addUserName(state, {payload}) {
       return {
         ...state,

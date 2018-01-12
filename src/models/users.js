@@ -1,5 +1,5 @@
-import {message} from 'antd';
-import {alterUsersData, deleteUsersData,queryUsersData} from '../services/users.js';
+import { message } from 'antd';
+import { alterUsersData, deleteUsersData,queryUsersData, addUsersData } from '../services/users.js';
 
 export default {
   namespace: 'users',
@@ -30,7 +30,7 @@ export default {
 
       const result =  yield call(addUsersData, payload);
 
-      if(result.message === 'ok'){
+      if(result.message == 1 ){
         yield put({
           type: 'changeUsersFormSubmitting',
           payload: false

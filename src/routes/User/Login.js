@@ -80,8 +80,7 @@ export default class Login extends Component {
           <Tabs animated={false} className={styles.tabs} activeKey={type} onChange={this.onSwitch}>
             <TabPane tab="Login-账号密码登录" key="account">
               {
-                login.status === 'error' &&
-                login.submitting === false &&
+                login.status === false &&
                 this.renderMessage('账户或密码错误')
               }
               <FormItem>

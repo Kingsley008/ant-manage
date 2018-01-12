@@ -1,24 +1,25 @@
 import React, {Component} from 'react';
-import {Button, Form, Input, Popconfirm, Table} from 'antd';
+import {Button, Form, Input, Popconfirm, Table, Modal} from 'antd';
 import {connect} from 'dva';
+import md5 from 'js-md5';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 const formItemLayout = {
   labelCol: {
-    xs: { span: 24 },
-    sm: { span: 7 },
+    xs: {span: 24},
+    sm: {span: 7},
   },
   wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 12 },
-    md: { span: 10 },
+    xs: {span: 24},
+    sm: {span: 12},
+    md: {span: 10},
   },
 };
 
 const submitFormLayout = {
   wrapperCol: {
-    xs: { span: 24, offset: 0 },
-    sm: { span: 10, offset: 7 },
+    xs: {span: 24, offset: 0},
+    sm: {span: 10, offset: 7},
   },
 };
 
@@ -36,7 +37,7 @@ const EditableCell = ({editable, value, onChange}) => (
   visible: state.users.visible,
   loading: state.users.loading,
   data: state.users.usersList,
-  totalCount:state.users.totalCount,
+  totalCount: state.users.totalCount,
   userName: state.login.userName,
 }))
 
@@ -51,7 +52,7 @@ export default class UsersForm extends Component {
     }
     // 默认返回第一页数据
     this.state = {
-      currentPage:1
+      currentPage: 1
     };
 
     this.columns = [{
@@ -59,35 +60,41 @@ export default class UsersForm extends Component {
       dataIndex: 'id',
       key: 1,
       render: (text, record) => this.renderColumns(text, record, 'id'),
-    }, {
-      title: '手机号码',
-      dataIndex: 'phoneNumber',
-      key: 2,
-      render: (text, record) => this.renderColumns(text, record, 'phoneNumber'),
     },
+      {
+        title: '手机号码',
+        dataIndex: 'phoneNumber',
+        key: 2,
+        render: (text, record) => this.renderColumns(text, record, 'phoneNumber'),
+      },
+      {
+        title: '密码',
+        dataIndex: 'password',
+        key: 3,
+        render: (text, record) => this.renderColumns(text, record, 'password'),
+      },
       {
         title: '收件人',
         dataIndex: 'trueName',
-        key: 3,
+        key: 4,
         render: (text, record) => this.renderColumns(text, record, 'trueName'),
       },
       {
         title: '地址',
         dataIndex: 'address',
-        key: 4,
+        key: 5,
         render: (text, record) => this.renderColumns(text, record, 'address'),
       },
-
       {
         title: '帐号类型',
         dataIndex: 'type',
-        key: 5,
+        key: 6,
         render: (text, record) => this.renderColumns(text, record, 'type'),
       },
       {
         title: '操作',
         dataIndex: 'operation',
-        key: 6,
+        key: 7,
         render: (text, record) => {
           const {editable} = record;
           return (
@@ -101,9 +108,9 @@ export default class UsersForm extends Component {
                     <a>取消</a>
                   </Popconfirm>
                 </span>
-                  : <span><a onClick={() => this.edit(record.id)} style={{marginRight:10}}>编辑</a>
+                  : <span><a onClick={() => this.edit(record.id)} style={{marginRight: 10}}>编辑</a>
                   <Popconfirm title="确定删除？" onConfirm={() => this.deleteUser(record.id)}>
-                    <Button type = 'danger'>
+                    <Button type='danger'>
                       删除
                     </Button>
                   </Popconfirm>
@@ -116,7 +123,7 @@ export default class UsersForm extends Component {
     //初始化 列表 data
     this.props.dispatch({
       type: 'users/getUsersList',
-      payload:this.state.currentPage,
+      payload: this.state.currentPage,
     });
 
   }
@@ -161,13 +168,13 @@ export default class UsersForm extends Component {
   deleteUser(id) {
 
     this.props.dispatch({
-      type:'users/deleteUsers',
+      type: 'users/deleteUsers',
       payload: id
     });
 
     this.props.dispatch({
       type: 'users/getUsersList',
-      payload:this.state.currentPage,
+      payload: this.state.currentPage,
     });
 
   }
@@ -181,7 +188,7 @@ export default class UsersForm extends Component {
 
   showModal = () => {
     this.props.dispatch({
-      type:'users/changeUsersFormVisibility',
+      type: 'users/changeUsersFormVisibility',
       payload: true
     })
   };
@@ -190,6 +197,9 @@ export default class UsersForm extends Component {
 
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        console.log(values);
+        values.password = md5(values.password);
+        values.id = 0;
         this.props.dispatch({
           type: 'users/submitUsersForm',
           payload: values,
@@ -201,125 +211,141 @@ export default class UsersForm extends Component {
 
   };
 
-  onChangePage = (page)=>{
+  onChangePage = (page) => {
 
     this.props.dispatch({
       type: 'users/getUsersList',
-      payload:page,
+      payload: page,
     });
 
     this.setState({
-      currentPage:page
+      currentPage: page
     })
   };
 
   handleCancel = () => {
     this.props.dispatch({
-      type:'users/changeUsersFormVisibility',
+      type: 'users/changeUsersFormVisibility',
       payload: false
     })
   };
 
   render() {
-    const {loading, visible } = this.props;
-    const { getFieldDecorator } = this.props.form;
+    const {loading, visible} = this.props;
+    const {getFieldDecorator} = this.props.form;
 
-      return (
-        <div>
+    return (
+      <div>
+        <PageHeaderLayout title="用户管理" content=""/>
+        <Button style={{marginBottom: 20, marginTop:20}} type="primary" onClick={this.showModal}>
+          添加新用户
+        </Button>
+        <Modal
+          visible={visible}
+          title="添加新的用户"
+          onCancel={this.handleCancel}
+          footer={[
+            <FormItem>
+              <Button key="back" onClick={this.handleCancel}>返回</Button>,
+              <Button key="submit" htmlType="submit" type="primary" loading={loading} onClick={this.handleOk}>
+                提交
+              </Button>
+            </FormItem>
+          ]}
+        >
+          <Form
+            onSubmit={this.handleSubmit}
+          >
 
-          {/*<Button style={{marginBottom: 20}} type="primary" onClick={this.showModal}>*/}
-            {/*添加新的设备*/}
-          {/*</Button>*/}
-          {/*<Modal*/}
-            {/*visible={visible}*/}
-            {/*title="添加新的网关"*/}
-            {/*onCancel={this.handleCancel}*/}
-            {/*footer={[*/}
-              {/*<FormItem>*/}
-              {/*<Button key="back" onClick={this.handleCancel}>返回</Button>,*/}
-              {/*<Button key="submit" htmlType="submit" type="primary" loading={loading} onClick={this.handleOk}>*/}
-                {/*提交*/}
-              {/*</Button>*/}
-              {/*</FormItem>*/}
-            {/*]}*/}
-          {/*>*/}
-              {/*<Form*/}
-                {/*onSubmit={this.handleSubmit}*/}
-                {/*hideRequiredMark*/}
-              {/*>*/}
+            <div style={{marginBottom: 50}}>
+              <FormItem
+                label="手机号"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('phoneNumber', {
+                  rules: [{
+                    required: true,
+                    message: '请输入正确的手机号',
+                    pattern:/^((1[3,5,8][0-9])|(14[5,7])|(17[0,6,7,8])|(19[7]))\d{8}$/,
+                  }],
+                })(
+                  <Input>
+                  </Input>
+                )}
+              </FormItem>
 
-                {/*<div style={{marginBottom: 50}}>*/}
-                  {/*<FormItem*/}
-                    {/*{...formItemLayout}*/}
-                    {/*label="网关号"*/}
-                  {/*>*/}
-                    {/*{getFieldDecorator('cross_id', {*/}
-                      {/*rules: [{*/}
-                        {/*required: true, message: '请输入网关号',*/}
-                      {/*}],*/}
-                    {/*})(*/}
-                      {/*<Input >*/}
+              <FormItem
+                label="密码"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('password', {
+                  rules: [{
+                    required: true, message: '请选择密码',
+                  }],
+                })(
+                  <Input>
+                  </Input>
+                )}
+              </FormItem>
 
-                      {/*</Input>*/}
-                    {/*)}*/}
-                  {/*</FormItem>*/}
+              <FormItem
+                label="地址"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('address', {
+                  rules: [{
+                    required: true, message: '请填写收获地址',
+                  }],
+                })(
+                  <Input>
+                  </Input>
+                )}
+              </FormItem>
 
-                  {/*<FormItem*/}
-                    {/*label="车道名称"*/}
-                    {/*{...formItemLayout}*/}
-                  {/*>*/}
-                    {/*{getFieldDecorator('road_name', {*/}
-                      {/*rules: [{*/}
-                        {/*required: true, message: '请输入车道名称',*/}
-                      {/*}],*/}
-                    {/*})(*/}
-                      {/*<Input>*/}
-                      {/*</Input>*/}
-                    {/*)}*/}
-                  {/*</FormItem>*/}
+              <FormItem
+                label="收货人"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('trueName', {
+                  rules: [{
+                    required: true, message: '请填写收货人',
+                  }],
+                })(
+                  <Input>
+                  </Input>
+                )}
+              </FormItem>
 
-                  {/*<FormItem*/}
-                    {/*label="经度"*/}
-                    {/*{...formItemLayout}*/}
-                  {/*>*/}
-                    {/*{getFieldDecorator('longitude', {*/}
-                      {/*rules: [{*/}
-                        {/*required: true, message: '请选择经度',*/}
-                      {/*}],*/}
-                    {/*})(*/}
-                      {/*<Input>*/}
-                      {/*</Input>*/}
-                    {/*)}*/}
-                  {/*</FormItem>*/}
+              <FormItem
+                label="帐号类型"
+                {...formItemLayout}
+              >
+                {getFieldDecorator('type', {
+                  rules: [{
+                    required: true, message: '请填写帐号类型',
+                    placeholder:'1 管理员 0 普通用户',
+                  }],
+                })(
+                  <Input placeholder = '1 管理员 0 普通用户' >
+                  </Input>
+                )}
+              </FormItem>
 
-                  {/*<FormItem*/}
-                    {/*label="纬度"*/}
-                    {/*{...formItemLayout}*/}
-                  {/*>*/}
-                    {/*{getFieldDecorator('latitude', {*/}
-                      {/*rules: [{*/}
-                        {/*required: true, message: '请选择纬度',*/}
-                      {/*}],*/}
-                    {/*})(*/}
-                      {/*<Input>*/}
-                      {/*</Input>*/}
-                    {/*)}*/}
-                  {/*</FormItem>*/}
-                {/*</div>*/}
-              {/*</Form>*/}
-          {/*</Modal>*/}
-          <PageHeaderLayout title="用户管理" content=""/>
-          <Table loading={loading} rowKey="uid" bordered dataSource={this.props.data}
-                 columns={this.columns}
-                 pagination={{
-                   total: this.props.totalCount,
-                   current: this.state.currentPage,
-                   onChange: (page) => {
-                     this.onChangePage(page)
-                   }
-          }} />
-        </div>
-      )
-    }
+            </div>
+          </Form>
+        </Modal>
+
+        <Table loading={loading} rowKey="uid" bordered dataSource={this.props.data}
+               columns={this.columns}
+               pagination={{
+                 total: this.props.totalCount,
+                 current: this.state.currentPage,
+                 onChange: (page) => {
+                   this.onChangePage(page)
+                 }
+               }}/>
+      </div>
+    )
+  }
 
 }
