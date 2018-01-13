@@ -1,13 +1,16 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
-import {Button, DatePicker, Form, Select, Table,Popconfirm} from 'antd';
+import {Button, DatePicker, Form, Select, Table,Popconfirm,Modal, Input} from 'antd';
 import {routerRedux} from 'dva/router';
 import {total} from "../../components/Charts/Pie/index";
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import ProductDetail from '../Detail/ProductDetail';
 
 const RangePicker = DatePicker.RangePicker;
 const Option = Select.Option;
 const FormItem = Form.Item;
+
+
 
 const columns = [
   {
@@ -65,9 +68,9 @@ const columns = [
   total: state.goods.total_page,
   userName: state.login.userName,
   loading: state.goods.loading,
+  visible:state.goods.visible,
 }))
 
-// TODO 分页
 @Form.create()
 export default class FlowTableThree extends Component {
   constructor(props) {
@@ -81,10 +84,12 @@ export default class FlowTableThree extends Component {
     this.props.dispatch({
       type: 'goods/fetchCategory',
     });
-    this.onChangePage = this.onChangePage.bind(this);
+
     this.state = {
       currentPage: 1,
+      visible:false,
     };
+    this.onChangePage = this.onChangePage.bind(this);
     this.getSubCategory = this.getSubCategory.bind(this);
   }
 
@@ -92,8 +97,7 @@ export default class FlowTableThree extends Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        console.log(values);
-
+        values.currentPage = this.state.currentPage;
         this.props.dispatch({
           type: 'goods/fetchProductByCategory',
           payload: values,
@@ -111,11 +115,28 @@ export default class FlowTableThree extends Component {
   onChangePage(pageNumber) {
     this.state.values.currentPage = pageNumber;
     this.state.currentPage = pageNumber;
+    console.log(this.state.values);
+
     this.props.dispatch({
-      type: 'goods/fetchFlowById',
+      type: 'goods/fetchProductByCategory',
       payload: this.state.values,
     });
+
   }
+
+  showModal = () => {
+    this.props.dispatch({
+      type: 'goods/changeProductFormVisibility',
+      payload: true
+    })
+  };
+
+  handleCancel = () => {
+    this.props.dispatch({
+      type: 'goods/changeProductFormVisibility',
+      payload: false
+    })
+  };
 
   getSubCategory(option){
     this.props.dispatch({
@@ -140,8 +161,6 @@ export default class FlowTableThree extends Component {
     if(subCategoryList != 0) {
       subCategoryOption = subCategoryList.map(id => <Option key={id}>{id}</Option>)
     }
-
-    // const laneOption = this.props.laneNo.map(i => <Option key={i}>{i}</Option>);
 
     // 设置Table数据
     const dataSource = [];
@@ -185,7 +204,7 @@ export default class FlowTableThree extends Component {
                 <FormItem
                   label="商品子分类"
                 >
-                  {getFieldDecorator('subcategory', {
+                  {getFieldDecorator('subCategory', {
                     rules: [{
                       required: true, message: '请输入子分类',
                     }],
@@ -202,8 +221,10 @@ export default class FlowTableThree extends Component {
                         loading={this.props.loading}>Search</Button>
               </FormItem>
             </div>
-            <Button type ="primary" style ={{marginBottom:'10px'}}>添加新的产品</Button>
+            <Button type ="primary" style ={{marginBottom:'10px'}} onClick={this.showModal}>添加新的产品</Button>
           </Form>
+
+
           <Table
             pagination={{
               total: this.props.total,
@@ -215,6 +236,8 @@ export default class FlowTableThree extends Component {
             columns={columns}
             dataSource={dataSource}
             loading={this.props.loading}/>
+            <ProductDetail visible = {this.props.visible} loading = {this.props.loading} handleCancel={this.handleCancel}/>
+
         </PageHeaderLayout>
       </div>
     )

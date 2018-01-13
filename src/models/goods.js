@@ -1,4 +1,5 @@
-import {getCategory,getSubCategory,getProductByCategory,getProductByCategoryAndSubCategory} from '../services/goods';
+import {getCategory,getSubCategory,getProductByCategory,getProductByCategoryAndSubCategory,getAllProductByCategory,
+getProductDetail} from '../services/goods';
 
 export default {
   namespace: 'goods',
@@ -6,15 +7,18 @@ export default {
     productList: [],
     categoryList: [],
     subCategoryList:[],
+    productDetail:{},
     total_page:0,
     loading:false,
+    visible:false,
     currentPage:1,
   },
 
   effects: {
     * fetchCategory(_, {call, put}){
       const response = yield call(getCategory);
-      console.log(response);
+
+      response.category.unshift('选择全部');
       yield put({
         type:'saveCategory',
         payload:response
@@ -31,12 +35,17 @@ export default {
     },
 
     * fetchProductByCategory({payload}, {call, put}) {
-
       yield put({
         type: 'addLoading',
       });
-
-      const response = yield call(getProductByCategory,payload);
+      let response = {};
+      if(payload.category === '选择全部' && payload.subCategory === '选择全部'){
+        response = yield call(getAllProductByCategory,payload);
+      }else if(payload.subCategory === '选择全部' && payload.category !== '选择全部'){
+        response = yield call(getProductByCategory,payload);
+      }else if(payload.subCategory !== '选择全部' && payload.category !== '选择全部'){
+        response = yield call(getProductByCategoryAndSubCategory,payload)
+      }
 
       yield put({
         type: 'saveProductList',
@@ -53,6 +62,21 @@ export default {
       })
 
     },
+    * fetchProductDetail({payload},{call, put}){
+      yield put({
+        type: 'addLoading',
+      });
+
+      const response = yield call(getProductDetail,payload);
+      yield put({
+        type: 'saveProductList',
+        payload: response.productDetail,
+      });
+
+      yield put({
+        type:'hideLoading',
+      })
+    }
 
   },
 
@@ -95,12 +119,17 @@ export default {
     },
 
     savePageCount(state, action) {
-      state.total_page = 0;
-      console.log(action);
       return {
         ...state,
         total_page: action.payload
       }
     },
+
+    changeProductFormVisibility(state, action){
+      return{
+        ...state,
+        visible:action.payload
+      }
+    }
   },
 };

@@ -36,18 +36,34 @@ export async function getSubCategory(payload) {
 
 }
 
-
 export async function getProductByCategory(payload) {
-  return request(`${key}/getProductsByCategory?category=${payload.category}`, {
+
+  return request(`${key}/getProductsByCategory?category=${payload.category}&currentPage=${payload.currentPage}`, {
+    method:'GET',
+    mode:'cors',
+  })
+}
+
+
+export async function getAllProductByCategory(payload) {
+
+  return request(`${key}/getAllProducts?currentPage=${payload.currentPage}`, {
     method:'GET',
     mode:'cors',
   })
 }
 
 export async function getProductByCategoryAndSubCategory(payload) {
-  return request(`${key}/getProductsByCategoryAndSub?category=${payload.category}&subCategory=${payload.subCategory}`, {
+
+  return request(`${key}/getProductsByCategoryAndSub?category=${payload.category}&subCategory=${payload.subCategory}&currentPage=${payload.currentPage}`, {
     method:'GET',
     mode:'cors',
   })
 }
+
+export async function getProductDetail(payload) {
+  return request(`${key}/showCurrentDetail?id=${payload}`)
+}
+
+
 
