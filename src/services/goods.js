@@ -62,10 +62,11 @@ export async function getProductByCategoryAndSubCategory(payload) {
 }
 
 export async function getProductDetail(payload) {
-  return request(`${key}/showCurrentDetail?id=${payload}`)
+  return request(`${key}/showCurrentDetail?id=${payload}`,{
+    method:'GET',
+    mode:'cors'
+  })
 }
-
-
 
 export async function updateProductDetail(payload) {
   let myHeaders = new Headers();
@@ -78,6 +79,12 @@ export async function updateProductDetail(payload) {
   })
 }
 
+export async function deleteProduct(payload) {
+  return request(`${key}/deleteProduct?id=${payload}`,{
+    method:'GET',
+    mode:'cors'
+  })
+}
 
 
 

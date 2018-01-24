@@ -5,6 +5,7 @@ import {routerRedux} from 'dva/router';
 import {total} from "../../components/Charts/Pie/index";
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import ProductDetail from '../../components/Detail/ProductDetail';
+import NewProductDetail from '../../components/Detail/NewProductDetail';
 
 const RangePicker = DatePicker.RangePicker;
 const Option = Select.Option;
@@ -19,6 +20,7 @@ const FormItem = Form.Item;
   userName: state.login.userName,
   loading: state.goods.loading,
   visible:state.goods.visible,
+  visible_new: state.goods.visible_new,
 }))
 
 @Form.create()
@@ -26,6 +28,7 @@ export default class FlowTableThree extends Component {
   constructor(props) {
     super(props);
     this.handleUpdateSubmit = this.handleUpdateSubmit.bind(this);
+    this.deleteProduct = this.deleteProduct.bind(this);
     this.columns = [
       {
         title: 'Id',
@@ -60,7 +63,7 @@ export default class FlowTableThree extends Component {
               {
                 <span>
               <a onClick={() => this.edit(record.id)} style={{marginRight: 10}}>详情</a>
-                  <Popconfirm title="确定删除？" onConfirm={() => this.deleteUser(record.id)}>
+                  <Popconfirm title="确定删除？" onConfirm={() => this.deleteProduct(record.id)}>
                     <Button type='danger'>
                       删除
                     </Button>
@@ -135,11 +138,13 @@ export default class FlowTableThree extends Component {
     })
   }
 
-  showModal = () => {
+  showNewModal = () => {
+    console.log('show')
     this.props.dispatch({
-      type: 'goods/changeProductFormVisibility',
+      type: 'goods/changeNewProductFormVisibility',
       payload: true
     })
+
   };
 
   handleCancel = () => {
@@ -149,6 +154,12 @@ export default class FlowTableThree extends Component {
     })
   };
 
+  handleNewCancel = () => {
+    this.props.dispatch({
+      type: 'goods/changeNewProductFormVisibility',
+      payload: false
+    })
+  };
   getSubCategory(option){
     this.props.dispatch({
       type:'goods/fetchSubCategory',
@@ -171,6 +182,19 @@ export default class FlowTableThree extends Component {
       type: 'goods/changeProductFormVisibility',
       payload: true
     })
+
+  }
+  deleteProduct(id){
+
+    this.props.dispatch({
+      type:'goods/deleteProduct',
+      payload:id
+    });
+
+    this.props.dispatch({
+      type: 'goods/fetchProductByCategory',
+      payload: this.state.values,
+    });
 
   }
   // 处理表单提交
@@ -250,7 +274,7 @@ export default class FlowTableThree extends Component {
                         loading={this.props.loading}>Search</Button>
               </FormItem>
             </div>
-            <Button type ="primary" style ={{marginBottom:'10px'}} onClick={this.showModal}>添加新的产品</Button>
+            <Button type ="primary" style ={{marginBottom:'10px'}} onClick={this.showNewModal}>添加新的产品</Button>
           </Form>
 
 
@@ -266,6 +290,7 @@ export default class FlowTableThree extends Component {
             dataSource={dataSource}
             loading={this.props.loading}/>
             <ProductDetail  handleUpdateSubmit = {this.handleUpdateSubmit} productDetail ={ this.props.productDetail } visible = {this.props.visible} loading = {this.props.loading} handleCancel={this.handleCancel}/>
+            <NewProductDetail visible = {this.props.visible_new} loading = {this.props.loading} handleCancel={this.handleNewCancel} />
         </PageHeaderLayout>
       </div>
     )

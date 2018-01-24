@@ -40,7 +40,7 @@ export  default  class ProductDetail extends Component {
 
     this.receiveHtml=this.receiveHtml.bind(this);
   }
-  // TODO 更新操作 更新 和 添加的 组件分开
+
   handleSubmit(){
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {

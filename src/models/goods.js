@@ -1,38 +1,47 @@
-import {getCategory,getSubCategory,getProductByCategory,getProductByCategoryAndSubCategory,getAllProductByCategory,
-getProductDetail,updateProductDetail} from '../services/goods';
-import { message } from 'antd';
+import {
+  deleteProduct,
+  getAllProductByCategory,
+  getCategory,
+  getProductByCategory,
+  getProductByCategoryAndSubCategory,
+  getProductDetail,
+  getSubCategory,
+  updateProductDetail
+} from '../services/goods';
+import {message} from 'antd';
 
 export default {
   namespace: 'goods',
   state: {
     productList: [],
     categoryList: [],
-    subCategoryList:[],
-    productDetail:{},
-    total_page:0,
-    loading:false,
-    visible:false,
-    currentPage:1,
-    htmlContent:`<h1>Yankees, Peeking at the Red Sox, Will Soon Get an Eyeful</h1>`
+    subCategoryList: [],
+    productDetail: {},
+    total_page: 0,
+    loading: false,
+    visible: false,
+    currentPage: 1,
+    visible_new: false,
+    htmlContent: `<h1>Yankees, Peeking at the Red Sox, Will Soon Get an Eyeful</h1>`
   },
 
   effects: {
-    * fetchCategory(_, {call, put}){
+    * fetchCategory(_, {call, put}) {
       const response = yield call(getCategory);
 
       response.category.unshift('选择全部');
       yield put({
-        type:'saveCategory',
-        payload:response
+        type: 'saveCategory',
+        payload: response
       })
     },
 
     * fetchSubCategory({payload}, {call, put}) {
-      const response = yield call(getSubCategory,payload);
+      const response = yield call(getSubCategory, payload);
       response.subCategory.unshift('选择全部');
       yield put({
-        type:'saveSubCategory',
-        payload:response.subCategory,
+        type: 'saveSubCategory',
+        payload: response.subCategory,
       });
     },
 
@@ -41,12 +50,12 @@ export default {
         type: 'addLoading',
       });
       let response = {};
-      if(payload.category === '选择全部' && payload.subCategory === '选择全部'){
-        response = yield call(getAllProductByCategory,payload);
-      }else if(payload.subCategory === '选择全部' && payload.category !== '选择全部'){
-        response = yield call(getProductByCategory,payload);
-      }else if(payload.subCategory !== '选择全部' && payload.category !== '选择全部'){
-        response = yield call(getProductByCategoryAndSubCategory,payload)
+      if (payload.category === '选择全部' && payload.subCategory === '选择全部') {
+        response = yield call(getAllProductByCategory, payload);
+      } else if (payload.subCategory === '选择全部' && payload.category !== '选择全部') {
+        response = yield call(getProductByCategory, payload);
+      } else if (payload.subCategory !== '选择全部' && payload.category !== '选择全部') {
+        response = yield call(getProductByCategoryAndSubCategory, payload)
       }
 
       yield put({
@@ -60,16 +69,16 @@ export default {
       });
 
       yield put({
-        type:'hideLoading',
+        type: 'hideLoading',
       })
 
     },
-    * fetchProductDetail({payload},{call, put}){
+    * fetchProductDetail({payload}, {call, put}) {
       yield put({
         type: 'addLoading',
       });
 
-      const response = yield call(getProductDetail,payload);
+      const response = yield call(getProductDetail, payload);
       console.log(response);
 
       yield put({
@@ -78,22 +87,19 @@ export default {
       });
 
       yield put({
-        type:'hideLoading',
+        type: 'hideLoading',
       })
     },
 
-    * updateProductDetail({payload},{call, put}){
+    * updateProductDetail({payload}, {call, put}) {
       yield put({
         type: 'addLoading',
       });
-
-      const  result = yield call(updateProductDetail, payload);
-      console.log(result);
-
-      if(result.message == 1 ){
+      const result = yield call(updateProductDetail, payload);
+      if (result.message == 1) {
 
         yield put({
-          type:'hideLoading',
+          type: 'hideLoading',
         });
 
         yield put({
@@ -103,7 +109,7 @@ export default {
 
         message.success('更新成功');
 
-        const result = yield call(queryUsersData,payload);
+        const result = yield call(queryUsersData, payload);
         console.log(result);
         yield put({
           type: 'getUsersListLocal',
@@ -113,26 +119,37 @@ export default {
       } else {
         message.success('提交失败');
         yield put({
-          type:'hideLoading',
+          type: 'hideLoading',
         });
       }
+    },
+
+    * deleteProduct({payload}, {call, put}) {
+      const result = yield call(deleteProduct, payload);
+
+      if (result.message === 1) {
+        message.success('删除成功');
+      } else {
+        message.fail('删除失败');
+      }
+
     }
 
   },
 
   reducers: {
-    saveCategory(state, action){
+    saveCategory(state, action) {
       console.log(action.payload);
       return {
         ...state,
-        categoryList:action.payload.category
+        categoryList: action.payload.category
       }
     },
 
     saveSubCategory(state, action) {
       return {
         ...state,
-        subCategoryList:action.payload
+        subCategoryList: action.payload
       }
     },
 
@@ -143,23 +160,23 @@ export default {
       };
     },
 
-    saveProductDetail(state, action){
+    saveProductDetail(state, action) {
       return {
         ...state,
-        productDetail:action.payload
+        productDetail: action.payload
       }
     },
-    addLoading(state){
-      return{
+    addLoading(state) {
+      return {
         ...state,
-        loading:true
+        loading: true
       }
     },
 
-    hideLoading(state){
-      return{
+    hideLoading(state) {
+      return {
         ...state,
-        loading:false
+        loading: false
       }
     },
 
@@ -170,16 +187,25 @@ export default {
       }
     },
 
-    changeProductFormVisibility(state, action){
-      return{
+    changeProductFormVisibility(state, action) {
+      return {
         ...state,
-        visible:action.payload
+        visible: action.payload
       }
     },
-    saveHtmlContent(state, action){
-      return{
+
+    changeNewProductFormVisibility(state, action) {
+      console.log(action);
+      return {
         ...state,
-        htmlContent:action.payload
+        visible_new:action.payload
+      }
+    },
+
+    saveHtmlContent(state, action) {
+      return {
+        ...state,
+        htmlContent: action.payload
       }
     }
   },
