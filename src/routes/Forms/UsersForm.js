@@ -125,7 +125,6 @@ export default class UsersForm extends Component {
       type: 'users/getUsersList',
       payload: this.state.currentPage,
     });
-
   }
 
   renderColumns(text, record, column) {
@@ -148,7 +147,6 @@ export default class UsersForm extends Component {
   }
 
   edit(key) {
-
     this.props.dispatch({
       type: 'users/editUsersList',
       payload: key

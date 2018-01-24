@@ -4,65 +4,15 @@ import {Button, DatePicker, Form, Select, Table,Popconfirm,Modal, Input} from 'a
 import {routerRedux} from 'dva/router';
 import {total} from "../../components/Charts/Pie/index";
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import ProductDetail from '../Detail/ProductDetail';
+import ProductDetail from '../../components/Detail/ProductDetail';
 
 const RangePicker = DatePicker.RangePicker;
 const Option = Select.Option;
 const FormItem = Form.Item;
 
-
-
-const columns = [
-  {
-    title: 'Id',
-    dataIndex: 'id',
-    key: '1',
-  },
-  {
-    title: '商品名称',
-    dataIndex: 'name',
-    key: '2',
-  },
-  {
-    title: '商品图片',
-    dataIndex: 'icon',
-    key: '4',
-    render:(value)=>{
-      console.log(value);
-      return (
-        <div>
-          <img src={value} style={{display:'inline-block', height:'100px', width:'100px',zoom:'1',border:'1px solid black'}}></img>
-        </div>
-      )
-    }
-  },
-  {
-    title: '操作',
-    dataIndex: 'operation',
-    key: 7,
-    render: (text, record) => {
-
-      return (
-        <div className="editable-row-operations">
-          {
-            <span>
-              <a onClick={() => this.edit(record.id)} style={{marginRight: 10}}>详情</a>
-                  <Popconfirm title="确定删除？" onConfirm={() => this.deleteUser(record.id)}>
-                    <Button type='danger'>
-                      删除
-                    </Button>
-                  </Popconfirm>
-            </span>
-          }
-        </div>
-      );
-    },
-  }
-];
-
-
 @connect((state) => ({
   productList: state.goods.productList,
+  productDetail: state.goods.productDetail,
   categoryList: state.goods.categoryList,
   subCategoryList: state.goods.subCategoryList,
   total: state.goods.total_page,
@@ -75,6 +25,54 @@ const columns = [
 export default class FlowTableThree extends Component {
   constructor(props) {
     super(props);
+    this.handleUpdateSubmit = this.handleUpdateSubmit.bind(this);
+    this.columns = [
+      {
+        title: 'Id',
+        dataIndex: 'id',
+        key: 1,
+      },
+      {
+        title: '商品名称',
+        dataIndex: 'name',
+        key: 2,
+      },
+      {
+        title: '商品图片',
+        dataIndex: 'icon',
+        key: 3,
+        render:(value)=>{
+          return (
+            <div>
+              <img src={value} style={{display:'inline-block', height:'100px', width:'100px',zoom:'1',border:'1px solid black'}}></img>
+            </div>
+          )
+        }
+      },
+      {
+        title: '操作',
+        dataIndex: 'operation',
+        key: 4,
+        render: (text, record) => {
+
+          return (
+            <div className="editable-row-operations">
+              {
+                <span>
+              <a onClick={() => this.edit(record.id)} style={{marginRight: 10}}>详情</a>
+                  <Popconfirm title="确定删除？" onConfirm={() => this.deleteUser(record.id)}>
+                    <Button type='danger'>
+                      删除
+                    </Button>
+                  </Popconfirm>
+            </span>
+              }
+            </div>
+          );
+        },
+      }
+    ];
+
     if (this.props.userName === null) {
       this.props.dispatch({
         type: 'login/invalidLogin'
@@ -115,13 +113,26 @@ export default class FlowTableThree extends Component {
   onChangePage(pageNumber) {
     this.state.values.currentPage = pageNumber;
     this.state.currentPage = pageNumber;
-    console.log(this.state.values);
 
     this.props.dispatch({
       type: 'goods/fetchProductByCategory',
       payload: this.state.values,
     });
+  }
 
+  handleUpdateSubmit(){
+    this.props.form.validateFieldsAndScroll((err, values) => {
+      if (!err) {
+        values.text = this.state.htmlContent;
+        console.log(values);
+
+        this.props.dispatch({
+          type: 'goods/updateProductDetail',
+          payload: values,
+        });
+
+      }
+    })
   }
 
   showModal = () => {
@@ -143,6 +154,24 @@ export default class FlowTableThree extends Component {
       type:'goods/fetchSubCategory',
       payload:option
     })
+  }
+
+  edit(id){
+    this.props.dispatch({
+      type:'goods/fetchProductDetail',
+      payload:id,
+    });
+
+    this.props.dispatch({
+      type:'goods/saveHtmlContent',
+      payload: this.props.productDetail.text
+    });
+
+    this.props.dispatch({
+      type: 'goods/changeProductFormVisibility',
+      payload: true
+    })
+
   }
   // 处理表单提交
   render() {
@@ -233,11 +262,10 @@ export default class FlowTableThree extends Component {
                 this.onChangePage(page)
               }
             }}
-            columns={columns}
+            columns={this.columns}
             dataSource={dataSource}
             loading={this.props.loading}/>
-            <ProductDetail visible = {this.props.visible} loading = {this.props.loading} handleCancel={this.handleCancel}/>
-
+            <ProductDetail  handleUpdateSubmit = {this.handleUpdateSubmit} productDetail ={ this.props.productDetail } visible = {this.props.visible} loading = {this.props.loading} handleCancel={this.handleCancel}/>
         </PageHeaderLayout>
       </div>
     )

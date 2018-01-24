@@ -67,3 +67,17 @@ export async function getProductDetail(payload) {
 
 
 
+export async function updateProductDetail(payload) {
+  let myHeaders = new Headers();
+  myHeaders.append('Content-Type', 'application/json');
+  return request(`${key}/updateCurrentDetail`,{
+    headers:myHeaders,
+    method:'POST',
+    mode:'cors',
+    body:payload,
+  })
+}
+
+
+
+

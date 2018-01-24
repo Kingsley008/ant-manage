@@ -10,6 +10,7 @@ export default {
     visible:false,
   },
   effects: {
+
     * getUsersList({payload}, {call, put}) {
       const result = yield call(queryUsersData,payload);
       yield put({
@@ -40,8 +41,9 @@ export default {
           payload: false
         });
         message.success('提交成功');
+        let currentPage = 1;
 
-        const result = yield call(queryUsersData,payload);
+        const result = yield call(queryUsersData,currentPage);
         console.log(result);
         yield put({
           type: 'getUsersListLocal',
@@ -57,7 +59,7 @@ export default {
     * saveUsersList({payload}, {call, put}) {
 
       const target = payload.newData.filter(item => payload.id === item.id)[0];
-      console.log(target);
+
       if (target) {
         yield put({
           type: 'changeUsersFormSubmitting',
@@ -89,7 +91,6 @@ export default {
         payload: false
       });
     }
-
   },
   reducers: {
 
@@ -112,9 +113,15 @@ export default {
       }
     },
     getUsersListLocal(state, {payload}) {
+      let temp = [];
+      payload.forEach((v)=>{
+        temp.push(Object.assign({},v))
+      });
+
       return {
         ...state,
-        usersList: payload
+        usersList: payload,
+        usersListCache:temp
       }
     },
 

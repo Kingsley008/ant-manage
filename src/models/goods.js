@@ -1,5 +1,6 @@
 import {getCategory,getSubCategory,getProductByCategory,getProductByCategoryAndSubCategory,getAllProductByCategory,
-getProductDetail} from '../services/goods';
+getProductDetail,updateProductDetail} from '../services/goods';
+import { message } from 'antd';
 
 export default {
   namespace: 'goods',
@@ -12,6 +13,7 @@ export default {
     loading:false,
     visible:false,
     currentPage:1,
+    htmlContent:`<h1>Yankees, Peeking at the Red Sox, Will Soon Get an Eyeful</h1>`
   },
 
   effects: {
@@ -68,14 +70,52 @@ export default {
       });
 
       const response = yield call(getProductDetail,payload);
+      console.log(response);
+
       yield put({
-        type: 'saveProductList',
+        type: 'saveProductDetail',
         payload: response.productDetail,
       });
 
       yield put({
         type:'hideLoading',
       })
+    },
+
+    * updateProductDetail({payload},{call, put}){
+      yield put({
+        type: 'addLoading',
+      });
+
+      const  result = yield call(updateProductDetail, payload);
+      console.log(result);
+
+      if(result.message == 1 ){
+
+        yield put({
+          type:'hideLoading',
+        });
+
+        yield put({
+          type: 'changeProductFormVisibility',
+          payload: false
+        });
+
+        message.success('更新成功');
+
+        const result = yield call(queryUsersData,payload);
+        console.log(result);
+        yield put({
+          type: 'getUsersListLocal',
+          payload: result,
+        });
+
+      } else {
+        message.success('提交失败');
+        yield put({
+          type:'hideLoading',
+        });
+      }
     }
 
   },
@@ -103,7 +143,12 @@ export default {
       };
     },
 
-
+    saveProductDetail(state, action){
+      return {
+        ...state,
+        productDetail:action.payload
+      }
+    },
     addLoading(state){
       return{
         ...state,
@@ -129,6 +174,12 @@ export default {
       return{
         ...state,
         visible:action.payload
+      }
+    },
+    saveHtmlContent(state, action){
+      return{
+        ...state,
+        htmlContent:action.payload
       }
     }
   },

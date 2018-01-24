@@ -25,7 +25,7 @@ export const getNavData = app => [
       {
         name:'用户管理',
         path:'users',
-        icon:'table',
+        icon:'user',
         component:dynamicWrapper(app, ['users'], ()=> import('../routes/Forms/UsersForm')),
       },
 
