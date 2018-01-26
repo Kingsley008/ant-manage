@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
 import LzEditor from 'react-lz-editor';
-import {Button,message, Form,Modal, Input} from 'antd';
+import {Button, Form, Input, message, Modal} from 'antd';
 
 const formItemLayout = {
   labelCol: {
@@ -16,48 +16,55 @@ const formItemLayout = {
 };
 
 const FormItem = Form.Item;
-@connect((state) => ({
-
-}))
+@connect((state) => ({}))
 @Form.create()
-export  default  class NewProductDetail extends Component {
+export default class NewProductDetail extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
+    this.receiveHtml = this.receiveHtml.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-      this.state = {
-        htmlContent: `<h1>text</h1>`,
-        responseList: []
-      };
+    this.state = {
+      htmlContent: `<h1>text</h1>`,
+      responseList: []
+    };
   }
 
-  handleSubmit(){
+  handleSubmit() {
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         values.text = this.state.htmlContent;
+        // console.log(values);
         this.props.dispatch({
-          type: 'goods/updateProductDetail',
+          type: 'goods/addNewProduct',
           payload: values,
         });
       }
     })
   }
 
-  handleChange = (info)=>{
+  handleChange = (info) => {
     console.log(info);
     if (info.file.status === 'uploading') {
       console.log('loading');
+      message.success(`文件上传中`);
     }
 
     if (info.file.status !== 'uploading') {
-      console.log(info.file, info.fileList);
+     // console.log(info.file, info.fileList);
     }
 
     if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`);
+      message.success(`${info.file.name} 文件成功上传`);
+      this.setState({
+         htmlContent: this.state.htmlContent + '<img src= "' + info.file.response.address + '" alt="test"/>'
+      })
     } else if (info.file.status === 'error') {
       message.error(`${info.file.name} file upload failed.`);
     }
+    this.setState({
+      responseList: info.fileList,
+    })
 
     // if(e.file.status == 'done'){
     //   this.setState({
@@ -69,15 +76,14 @@ export  default  class NewProductDetail extends Component {
   };
 
   receiveHtml(content) {
-    console.log(content);
     this.setState({
-      htmlContent:content
+      htmlContent: content
     })
   }
 
-  render(){
+  render() {
     const {getFieldDecorator} = this.props.form;
-    const { previewVisible, previewImage, responseList } = this.state;
+    const {previewVisible, previewImage, responseList} = this.state;
 
     const uploadProps = {
       action: "http://localhost:8080/biyaoweb/uploadImage", // 上传的地址
@@ -85,179 +91,193 @@ export  default  class NewProductDetail extends Component {
       listType: 'picture', // 上传样式
       fileList: responseList,  //已经上传的文件列表
       data: (file) => {
-      // 上传所需参数或返回上传参数的方法
+        // 上传所需参数或返回上传参数的方法
       },
       multiple: true,
       showUploadList: true
     };
 
-      return(
-        <Modal
-          width={720}
-          visible={this.props.visible}
-          title="添加新的产品"
-          onCancel={this.props.handleCancel}
-          footer={[
-            <FormItem>
-              <Button key="back" onClick={this.props.handleCancel}>返回</Button>,
-              <Button key="submit" htmlType="submit" type="primary" loading={this.props.loading} onClick={this.handleSubmit}>
-                提交
-              </Button>
-            </FormItem>
-          ]}
+    return (
+      <Modal
+        width={720}
+        visible={this.props.visible}
+        title="添加新的产品"
+        onCancel={this.props.handleCancel}
+        footer={[
+          <FormItem>
+            <Button key="back" onClick={this.props.handleCancel}>返回</Button>,
+            <Button key="submit" htmlType="submit" type="primary" loading={this.props.loading}
+                    onClick={this.handleSubmit}>
+              提交
+            </Button>
+          </FormItem>
+        ]}
+      >
+        <Form
+          onSubmit={this.handleSubmit}
         >
-          <Form
-            onSubmit={this.handleSubmit}
-          >
 
-            <div style={{marginBottom: 50}}>
-              <FormItem
-                label="Id"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('id', {
-                  rules: [{
-                    required: true,
-                  }],
-                  initialValue:0,
-                })(
-                  <Input disable="true">
-                  </Input>
-                )}
-              </FormItem>
+          <div style={{marginBottom: 50}}>
+            <FormItem
+              label="Id"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('id', {
+                rules: [{
+                  required: true,
+                }],
+                initialValue: 0,
+              })(
+                <Input disable="true">
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="商品名称"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('name', {
-                  rules: [{
-                    required: true, message: '请输入商品名称',
-                  }],
-                })(
-                  <Input>
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="商品名称"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('name', {
+                rules: [{
+                  required: true, message: '请输入商品名称',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="商品介绍"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('intro', {
-                  rules: [{
-                    required: true, message: '请填写商品介绍',
-                  }],
-                })(
-                  <Input>
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="商品介绍"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('intro', {
+                rules: [{
+                  required: true, message: '请填写商品介绍',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
+            <FormItem
+              label="生产时长"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('produceDate', {
+                rules: [{
+                  required: true, message: '请填写生产时长',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
+            <FormItem
+              label="商品分类"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('catagory', {
+                rules: [{
+                  required: true, message: '请输入商品分类',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="商品分类"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('catagory', {
-                  rules: [{
-                    required: true, message: '请输入商品分类',
-                  }],
-                })(
-                  <Input>
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="商品子分类"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('subCatagory', {
+                rules: [{
+                  required: true, message: '请填写商品子分类',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="商品子分类"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('subCatagory', {
-                  rules: [{
-                    required: true, message: '请填写商品子分类',
-                  }],
-                })(
-                  <Input>
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="售价"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('price', {
+                rules: [{
+                  required: true, message: '请填写商品售价',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="售价"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('price', {
-                  rules: [{
-                    required: true, message: '请填写商品售价',
-                  }],
-                })(
-                  <Input>
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="图片集"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('imgs', {
+                rules: [{
+                  required: true, message: '请填写图片集',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="图片集"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('price', {
-                  rules: [{
-                    required: true, message: '请填写图片集',
-                  }],
-                })(
-                  <Input >
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="封面图片"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('icon', {
+                rules: [{
+                  required: true, message: '请填写商品封面',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="封面图片"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('price', {
-                  rules: [{
-                    required: true, message: '请填写商品封面',
-                  }],
-                })(
-                  <Input>
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="颜色"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('colors', {
+                rules: [{
+                  required: true, message: '请填写颜色分类',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="颜色"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('colors', {
-                  rules: [{
-                    required: true, message: '请填写颜色分类',
-                  }],
-                })(
-                  <Input>
-                  </Input>
-                )}
-              </FormItem>
+            <FormItem
+              label="尺码"
+              {...formItemLayout}
+            >
+              {getFieldDecorator('sizes', {
+                rules: [{
+                  required: true, message: '请填写尺码分类',
+                }],
+              })(
+                <Input>
+                </Input>
+              )}
+            </FormItem>
 
-              <FormItem
-                label="尺码"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('sizes', {
-                  rules: [{
-                    required: true, message: '请填写尺码分类',
-                  }],
-                })(
-                  <Input >
-                  </Input>
-                )}
-              </FormItem>
-
-              <div style={{marginBottom:'10px'}}>商品详情页设置
-              </div>
-              <LzEditor active={true} importContent={this.state.htmlContent}  cbReceiver={this.receiveHtml} lang="cn"  uploadProps={uploadProps} />
+            <div style={{marginBottom: '10px'}}>商品详情页设置
             </div>
-          </Form>
-        </Modal>
-      )
-    }
+            <LzEditor active={true} importContent={this.state.htmlContent} cbReceiver={this.receiveHtml} lang="cn"
+                      uploadProps={uploadProps}/>
+          </div>
+        </Form>
+      </Modal>
+    )
+  }
 }

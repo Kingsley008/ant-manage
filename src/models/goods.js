@@ -6,7 +6,8 @@ import {
   getProductByCategoryAndSubCategory,
   getProductDetail,
   getSubCategory,
-  updateProductDetail
+  updateProductDetail,
+  addNewProduct,
 } from '../services/goods';
 import {message} from 'antd';
 
@@ -132,6 +133,23 @@ export default {
       } else {
         message.fail('删除失败');
       }
+
+    },
+
+    * addNewProduct({payload},{call, put}) {
+      console.log(payload);
+      const result = yield call(addNewProduct, payload);
+      console.log(result);
+      if(result === 1){
+        message.success('添加成功');
+        put({
+          type:'changeNewProductFormVisibility',
+          payload:false
+        })
+      }else{
+        message.fail('添加失败')
+      }
+
 
     }
 

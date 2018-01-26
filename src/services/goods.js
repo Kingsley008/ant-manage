@@ -62,6 +62,7 @@ export async function getProductByCategoryAndSubCategory(payload) {
 }
 
 export async function getProductDetail(payload) {
+
   return request(`${key}/showCurrentDetail?id=${payload}`,{
     method:'GET',
     mode:'cors'
@@ -69,6 +70,7 @@ export async function getProductDetail(payload) {
 }
 
 export async function updateProductDetail(payload) {
+
   let myHeaders = new Headers();
   myHeaders.append('Content-Type', 'application/json');
   return request(`${key}/updateCurrentDetail`,{
@@ -80,9 +82,23 @@ export async function updateProductDetail(payload) {
 }
 
 export async function deleteProduct(payload) {
+
   return request(`${key}/deleteProduct?id=${payload}`,{
     method:'GET',
     mode:'cors'
+  })
+
+}
+
+export async function addNewProduct(payload) {
+
+  let myHeaders = new Headers();
+  myHeaders.append('Content-Type', 'application/json');
+
+  return request(`${key}/addNewProduct`,{
+    method:'POST',
+    mode:'cors',
+    body:payload,
   })
 }
 

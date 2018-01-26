@@ -40,7 +40,7 @@ export const getNavData = app => [
         name:'订单管理',
         path:'orders',
         icon:'form',
-        component:dynamicWrapper(app, ['flowchartone'], ()=> import('../routes/Dashboard/FlowChartOne')),
+        component:dynamicWrapper(app, ['orders'], ()=> import('../routes/Dashboard/Orders')),
       },
 
    /*   {
