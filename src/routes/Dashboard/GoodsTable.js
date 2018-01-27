@@ -24,7 +24,7 @@ const FormItem = Form.Item;
 }))
 
 @Form.create()
-export default class FlowTableThree extends Component {
+export default class GoodsTable extends Component {
   constructor(props) {
     super(props);
     this.handleUpdateSubmit = this.handleUpdateSubmit.bind(this);

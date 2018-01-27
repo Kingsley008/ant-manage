@@ -157,7 +157,7 @@ export default {
 
   reducers: {
     saveCategory(state, action) {
-      console.log(action.payload);
+
       return {
         ...state,
         categoryList: action.payload.category

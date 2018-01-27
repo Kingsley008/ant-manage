@@ -19,7 +19,13 @@ export const getNavData = app => [
         name: 'dashboard',
         icon: 'form',
         path: 'dashboard',
-        component: dynamicWrapper(app, ['dashboard'], () => import('../routes/Dashboard.js')),
+        children: [
+          {
+            name: '分析页',
+            path: 'analysis',
+            component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),
+          },
+        ],
       },
 
       {
@@ -40,7 +46,7 @@ export const getNavData = app => [
         name:'订单管理',
         path:'orders',
         icon:'form',
-        component:dynamicWrapper(app, ['orders'], ()=> import('../routes/Dashboard/Orders')),
+        component:dynamicWrapper(app, ['orders'], ()=> import('../routes/Dashboard/OrdersTable')),
       },
 
    /*   {

@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { alterUsersData, deleteUsersData,queryUsersData, addUsersData } from '../services/users.js';
+import { alterUsersData, deleteUsersData,queryUsersData, addUsersData} from '../services/users.js';
 
 export default {
   namespace: 'users',
