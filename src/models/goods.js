@@ -140,14 +140,14 @@ export default {
       console.log(payload);
       const result = yield call(addNewProduct, payload);
       console.log(result);
-      if(result === 1){
+      if(result.message == 1){
         message.success('添加成功');
-        put({
+        yield put({
           type:'changeNewProductFormVisibility',
           payload:false
         })
       }else{
-        message.fail('添加失败')
+        message.error('添加失败')
       }
 
 

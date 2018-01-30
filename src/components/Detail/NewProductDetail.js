@@ -24,6 +24,7 @@ export default class NewProductDetail extends Component {
     super(props);
     this.receiveHtml = this.receiveHtml.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+
     this.state = {
       htmlContent: `<h1>text</h1>`,
       responseList: []

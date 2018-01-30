@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'dva';
 import LzEditor from 'react-lz-editor';
-import {Button, DatePicker, Form, Select, Table,Popconfirm,Modal, Input} from 'antd';
+import {Button, DatePicker, Form, Select, Table,Popconfirm,Modal, Input, message} from 'antd';
 
 const formItemLayout = {
   labelCol: {
@@ -25,20 +25,12 @@ export  default  class ProductDetail extends Component {
   constructor(props){
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    // if(this.props.productDetail){
-    //
-    //   this.state = {
-    //     htmlContent: `${this.props.productDetail.text}`,
-    //     responseList: []
-    //   };
-    // }else{
-    //   this.state = {
-    //     htmlContent: `<h1>Yankees, Peeking at the Red Sox, Will Soon Get an Eyeful</h1>`,
-    //     responseList: []
-    //   };
-    // }
-
     this.receiveHtml=this.receiveHtml.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.state = {
+      htmlContent: this.props.productDetail.text,
+      responseList: []
+    };
   }
 
   handleSubmit(){
@@ -53,24 +45,52 @@ export  default  class ProductDetail extends Component {
       }
     })
   }
-  receiveHtml(content) {
-    // console.log("recieved HTML content", content);
-    this.props.dispatch({
-      type:'goods/saveHtmlContent',
-      payload: content
-    });
-   // this.setState({responseList:[]});
-  }
+  handleChange = (info) => {
+    console.log(info);
+    if (info.file.status === 'uploading') {
+      console.log('loading');
+      message.success(`文件上传中`);
+    }
 
+    if (info.file.status !== 'uploading') {
+      // console.log(info.file, info.fileList);
+    }
+
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} 文件成功上传`);
+      this.setState({
+        htmlContent: this.state.htmlContent + '<img src= "' + info.file.response.address + '" alt="test"/>'
+      })
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+    this.setState({
+      responseList: info.fileList,
+    })
+
+    // if(e.file.status == 'done'){
+    //   this.setState({
+    //     responseList: e.fileList,
+    //     htmlContent: this.state.htmlContent +`<img src=${e.file.response.address} alt="test"/>`
+    //   })
+    // }
+
+  };
+
+  receiveHtml(content) {
+    this.setState({
+      htmlContent: content
+    })
+  }
 
   render(){
     const {getFieldDecorator} = this.props.form;
-
+    const {responseList} = this.state;
     const uploadProps = {
-      action: "http://v0.api.upyun.com/devopee",
-      onChange: this.onChange,
+      action: "http://localhost:8080/biyaoweb/uploadImage",
+      onChange: this.handleChange,
       listType: 'picture',
-    //  fileList: this.state.responseList,
+      fileList: responseList,  //已经上传的文件列表
       data: (file) => {
 
       },
