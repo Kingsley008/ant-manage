@@ -105,7 +105,7 @@ export  default  class ProductDetail extends Component {
         <Modal
           width={720}
           visible={this.props.visible}
-          title="添加新的产品"
+          title="商品详情修改"
           onCancel={this.props.handleCancel}
           footer={[
             <FormItem>
